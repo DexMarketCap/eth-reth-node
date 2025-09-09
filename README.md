@@ -2,39 +2,31 @@
 git clone https://github.com/yourusername/reth.git
 cd reth
 
-# Add the original repo as an upstream remote
+# Add upstream temporarily
 git remote add upstream https://github.com/paradigmxyz/reth.git
+
+# Fetch updates
 git fetch upstream
 
-# Make your changes in a branch
-git checkout -b sven
-# edit code, commit changes
-git push origin sven
+# Update your MAIN branch with upstream changes
+git checkout main
+git merge upstream/main
 
-# Updating from upstream without losing changes
-git fetch upstream
+# Update your CUSTOM branch with upstream changes
 git checkout sven
-git merge upstream/main   # or upstream/master depending on branch name
-
-# resolve conflicts if any
+git merge upstream/main
+# Resolve conflicts, then:
 git push origin sven
 
-# Build a custom Docker image
-docker build -t my-reth:latest .
+# push updates to branch
+git add .
+git commit -m "feat: my custom changes"
+git push origin sven
 
-docker tag my-reth:latest my-dockerhub-user/my-reth:latest
-docker push my-dockerhub-user/my-reth:latest
 
-# run your custom image
-docker pull my-dockerhub-user/my-reth:latest
-docker stop reth
-docker rm reth
-docker run ... my-dockerhub-user/my-reth:latest
 
 # Custom method
+rpc -> rpc-eth-api -> custom.rs - Custom RPC methods trait + implementations
+rpc -> rpc-eth-api -> lib.rs - Import Mods
 
 rpc -> rpc-eth-api -> core.rs - Core RPC methods trait + implementations
-
-rpc -> rpc-eth-api -> custom.rs - Custom RPC methods trait + implementations
-
-rpc -> rpc-eth-api -> lib.rs - Import Mods

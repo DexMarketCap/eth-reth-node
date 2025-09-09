@@ -60,14 +60,15 @@ where
     T: FullEthApi,
     jsonrpsee_types::error::ErrorObject<'static>: From<T::Error>,
 {
-    /// 
+    /// Handler for: `eth_getSven`
     fn get_sven(&self) -> RpcResult<String> {
+        trace!(target: "rpc::eth", "Serving eth_getSven");
         Ok("Sv3n".to_string())
     }
 
-     /// Handler for: `eth_blockNumber`
+    /// Handler for: `eth_blockNumber_sven`
     fn block_number_sven(&self) -> RpcResult<U256> {
-        trace!(target: "rpc::eth", "Serving eth_blockNumber");
+        trace!(target: "rpc::eth", "Serving eth_blockNumber_sven");
         Ok(U256::from(
             EthApiSpec::chain_info(self).with_message("failed to read chain info")?.best_number,
         ))

@@ -47,7 +47,7 @@ use reth_rpc_eth_api::{
     },
     node::RpcNodeCoreAdapter,
     EthApiServer, EthApiTypes, FullEthApiServer, RpcBlock, RpcConvert, RpcConverter, RpcHeader,
-    RpcNodeCore, RpcReceipt, RpcTransaction, RpcTxReq,
+    RpcNodeCore, RpcReceipt, RpcTransaction, RpcTxReq
 };
 use reth_rpc_eth_types::{receipt::EthReceiptConverter, EthConfig, EthSubscriptionIdProvider};
 use reth_rpc_layer::{AuthLayer, Claims, CompressionLayer, JwtAuthValidator, JwtSecret};

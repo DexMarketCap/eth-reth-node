@@ -718,9 +718,9 @@ max_outbound = 100
 max_inbound = 30
 
 [peers.reputation_weights]
-bad_message = -16384
-bad_block = -16384
-bad_transactions = -16384
+bad_message = -1000
+bad_block = -1000
+bad_transactions = -1000
 already_seen_transactions = 0
 timeout = -4096
 bad_protocol = -2147483648
@@ -751,11 +751,11 @@ nanos = 0
 block_interval = 5
 
 [prune.parts]
-sender_recovery = { distance = 16384 }
+sender_recovery = { distance = 1000 }
 transaction_lookup = 'full'
 receipts = { before = 1920000 }
-account_history = { distance = 16384 }
-storage_history = { distance = 16384 }
+account_history = { distance = 1000 }
+storage_history = { distance = 1000 }
 [prune.parts.receipts_log_filter]
 '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' = { before = 17000000 }
 '0xdac17f958d2ee523a2206206994597c13d831ec7' = { distance = 1000 }
@@ -764,11 +764,11 @@ storage_history = { distance = 16384 }
 
         let alpha_0_0_11 = r"#
 [prune.segments]
-sender_recovery = { distance = 16384 }
+sender_recovery = { distance = 1000 }
 transaction_lookup = 'full'
 receipts = { before = 1920000 }
-account_history = { distance = 16384 }
-storage_history = { distance = 16384 }
+account_history = { distance = 1000 }
+storage_history = { distance = 1000 }
 [prune.segments.receipts_log_filter]
 '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' = { before = 17000000 }
 '0xdac17f958d2ee523a2206206994597c13d831ec7' = { distance = 1000 }
@@ -837,9 +837,9 @@ max_inbound = 30
 max_concurrent_outbound_dials = 10
 
 [peers.reputation_weights]
-bad_message = -16384
-bad_block = -16384
-bad_transactions = -16384
+bad_message = -1000
+bad_block = -1000
+bad_transactions = -1000
 already_seen_transactions = 0
 timeout = -4096
 bad_protocol = -2147483648
@@ -930,9 +930,9 @@ max_inbound = 30
 max_concurrent_outbound_dials = 10
 
 [peers.reputation_weights]
-bad_message = -16384
-bad_block = -16384
-bad_transactions = -16384
+bad_message = -1000
+bad_block = -1000
+bad_transactions = -1000
 already_seen_transactions = 0
 timeout = -4096
 bad_protocol = -2147483648
@@ -971,9 +971,9 @@ nanos = 0
 block_interval = 5
 
 [prune.segments]
-sender_recovery = { distance = 16384 }
+sender_recovery = { distance = 1000 }
 transaction_lookup = 'full'
-receipts = { distance = 16384 }
+receipts = { distance = 1000 }
 #";
         let _conf: Config = toml::from_str(s).unwrap();
 
@@ -982,7 +982,7 @@ receipts = { distance = 16384 }
 block_interval = 5
 
 [prune.segments]
-sender_recovery = { distance = 16384 }
+sender_recovery = { distance = 1000 }
 transaction_lookup = 'full'
 receipts = 'full'
 #";

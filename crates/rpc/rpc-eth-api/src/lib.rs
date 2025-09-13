@@ -20,9 +20,7 @@ pub mod helpers;
 pub mod node;
 pub mod pubsub;
 pub mod types;
-pub mod custom;
 
-pub use custom::{CustomEthApiServer, FullCustomEthApiServer};
 pub use bundle::{EthBundleApiServer, EthCallBundleApiServer};
 pub use core::{EthApiServer, FullEthApiServer};
 pub use ext::L2EthApiExtServer;
@@ -35,8 +33,6 @@ pub use reth_rpc_eth_types::error::{
 };
 pub use types::{EthApiTypes, FullEthApiTypes, RpcBlock, RpcHeader, RpcReceipt, RpcTransaction};
 
-#[cfg(feature = "client")]
-pub use custom::CustomEthApiClient;
 #[cfg(feature = "client")]
 pub use bundle::{EthBundleApiClient, EthCallBundleApiClient};
 #[cfg(feature = "client")]

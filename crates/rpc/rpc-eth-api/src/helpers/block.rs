@@ -35,6 +35,59 @@ pub type BlockAndReceiptsResult<Eth> = Result<
 pub trait EthBlocks:
     LoadBlock<RpcConvert: RpcConvert<Primitives = Self::Primitives, Error = Self::Error>>
 {
+
+    /// Transaction detail structure
+    #[derive(Debug, Serialize)]
+    struct TransactionDetail {
+        hash: String,
+        from: String,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        created_contract: Option<String>,
+    }
+
+    /// Helper function for `eth_getBlockTransactionDetails` that returns transaction details.
+    ///
+    /// Returns an array of transaction objects containing hash, sender, and created contract address
+    /// Returns empty array if block wasn't found.
+    fn block_transaction_details(
+        &self,
+        block_id: BlockId,
+    ) -> impl Future<Output = Result<Vec<TransactionDetail>, Self::Error>> + Send
+    where
+        Self: LoadReceipt,
+    {
+        async move {
+            if let Some((block, receipts)) = self.load_block_and_receipts(block_id).await? {
+                let transactions = block
+                    .transactions_recovered()
+                    .zip(receipts.iter())
+                    .map(|(tx, receipt)| {
+                        let hash = *tx.tx_hash();
+                        let from = tx.recover_signer().map(|addr| addr.to_string()).unwrap_or_default();
+                        
+                        // Check if this transaction created a contract
+                        let created_contract = if let Some(contract_address) = receipt.contract_address() {
+                            Some(contract_address.to_string())
+                        } else {
+                            None
+                        };
+
+                        TransactionDetail {
+                            hash: format!("{hash:#x}"),
+                            from,
+                            created_contract,
+                        }
+                    })
+                    .collect::<Vec<_>>();
+
+                return Ok(transactions);
+            }
+
+            Ok(Vec::new())
+        }
+    }
+
+
     /// Returns the block header for the given block id.
     fn rpc_block_header(
         &self,

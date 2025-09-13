@@ -52,6 +52,7 @@ where
         > + FullEthApiTypes,
     EthFilter: EngineEthFilter,
 {
+
     /// Handler for: `eth_syncing`
     fn syncing(&self) -> Result<SyncStatus> {
         let span = engine_span!();

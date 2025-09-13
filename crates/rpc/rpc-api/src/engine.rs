@@ -250,6 +250,7 @@ pub trait EngineApi<Engine: EngineTypes> {
 #[cfg_attr(not(feature = "client"), rpc(server, namespace = "eth"))]
 #[cfg_attr(feature = "client", rpc(server, client, namespace = "eth"))]
 pub trait EngineEthApi<TxReq: RpcObject, B: RpcObject, R: RpcObject> {
+
     /// Returns an object with data about the sync status or false.
     #[method(name = "syncing")]
     fn syncing(&self) -> RpcResult<SyncStatus>;

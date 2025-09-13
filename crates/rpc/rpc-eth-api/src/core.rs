@@ -15,7 +15,7 @@ use alloy_rpc_types_eth::{
     StateContext, SyncStatus, Work,
 };
 use alloy_serde::JsonStorageKey;
-use jsonrpsee::{core::RpcResult, proc_macros::rpc};
+use jsonrpsee::{core::{RpcResult, Serialize}, proc_macros::rpc};
 use reth_rpc_convert::RpcTxReq;
 use reth_rpc_server_types::{result::internal_rpc_err, ToRpcResult};
 use tracing::trace;
@@ -46,10 +46,21 @@ impl<T> FullEthApiServer for T where
 {
 }
 
+/// Transaction detail structure
+struct TransactionDetail {
+    hash: String,
+    from: String,
+    created_contract: Option<String>,
+}
+
 /// Eth rpc interface: <https://ethereum.github.io/execution-apis/api-documentation>
 #[cfg_attr(not(feature = "client"), rpc(server, namespace = "eth"))]
 #[cfg_attr(feature = "client", rpc(server, client, namespace = "eth"))]
 pub trait EthApi<TxReq: RpcObject, T: RpcObject, B: RpcObject, R: RpcObject, H: RpcObject> {
+    /// Test function that returns a custom string.
+    #[method(name = "getBlockTransactionDetails")]
+    async fn get_block_transaction_details(&self) -> RpcResult<TransactionDetail>;
+
     /// Returns the protocol version encoded as a string.
     #[method(name = "protocolVersion")]
     async fn protocol_version(&self) -> RpcResult<U64>;
@@ -393,6 +404,14 @@ where
     T: FullEthApi,
     jsonrpsee_types::error::ErrorObject<'static>: From<T::Error>,
 {
+
+    /// Handler for: `eth_getSven`
+    async fn get_block_transaction_details(&self) -> RpcResult<TransactionDetail> {
+        trace!(target: "rpc::eth", "Serving get_block_transaction_details");
+        Ok(EthBlocks::block_transaction_details(self, number.into()).await?)
+    }
+
+
     /// Handler for: `eth_protocolVersion`
     async fn protocol_version(&self) -> RpcResult<U64> {
         trace!(target: "rpc::eth", "Serving eth_protocolVersion");

@@ -15,10 +15,12 @@ use alloy_rpc_types_eth::{
     StateContext, SyncStatus, Work,
 };
 use alloy_serde::JsonStorageKey;
-use jsonrpsee::{core::{RpcResult, Serialize}, proc_macros::rpc};
+use jsonrpsee::{core::{RpcResult}, proc_macros::rpc};
 use reth_rpc_convert::RpcTxReq;
 use reth_rpc_server_types::{result::internal_rpc_err, ToRpcResult};
 use tracing::trace;
+
+use serde::{Deserialize, Serialize};
 
 /// Helper trait, unifies functionality that must be supported to implement all RPC methods for
 /// server.
@@ -46,12 +48,20 @@ impl<T> FullEthApiServer for T where
 {
 }
 
-/// Transaction detail structure
-struct TransactionDetail {
-    hash: String,
-    from: String,
-    created_contract: Option<String>,
+/// Transaction detail information.
+///
+/// Contains basic information about a transaction including hash, sender,
+/// and contract address for contract creation transactions.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TransactionDetail {
+    /// transaction hash
+    pub hash: String,
+    /// sender address
+    pub from: String,
+    /// contracta ddress (if contract creation tx)
+    pub created_contract: Option<String>,
 }
+
 
 /// Eth rpc interface: <https://ethereum.github.io/execution-apis/api-documentation>
 #[cfg_attr(not(feature = "client"), rpc(server, namespace = "eth"))]
@@ -59,7 +69,7 @@ struct TransactionDetail {
 pub trait EthApi<TxReq: RpcObject, T: RpcObject, B: RpcObject, R: RpcObject, H: RpcObject> {
     /// Test function that returns a custom string.
     #[method(name = "getBlockTransactionDetails")]
-    async fn get_block_transaction_details(&self) -> RpcResult<TransactionDetail>;
+    async fn get_block_transaction_details(&self, block_id: BlockId) -> RpcResult<Vec<TransactionDetail>>;
 
     /// Returns the protocol version encoded as a string.
     #[method(name = "protocolVersion")]
@@ -406,9 +416,9 @@ where
 {
 
     /// Handler for: `eth_getSven`
-    async fn get_block_transaction_details(&self) -> RpcResult<TransactionDetail> {
+    async fn get_block_transaction_details(&self, block_id: BlockId) -> RpcResult<Vec<TransactionDetail>> {
         trace!(target: "rpc::eth", "Serving get_block_transaction_details");
-        Ok(EthBlocks::block_transaction_details(self, number.into()).await?)
+        Ok(EthBlocks::block_transaction_details(self, block_id).await?) // `?` operator has incompatible types
     }
 
 

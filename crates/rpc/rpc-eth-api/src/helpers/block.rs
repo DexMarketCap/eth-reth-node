@@ -1,5 +1,6 @@
 //! Database access for `eth_` block RPC methods. Loads block and receipt data w.r.t. network.
 
+use alloy_rpc_types_eth::TransactionTrait;
 use super::{LoadPendingBlock, LoadReceipt, SpawnBlocking};
 use crate::{
     node::RpcNodeCoreExt, EthApiTypes, FromEthApiError, FullEthApiTypes, RpcBlock, RpcNodeCore,
@@ -30,20 +31,14 @@ pub type BlockAndReceiptsResult<Eth> = Result<
     <Eth as EthApiTypes>::Error,
 >;
 
+
+use crate::core::TransactionDetail;
+
 /// Block related functions for the [`EthApiServer`](crate::EthApiServer) trait in the
 /// `eth_` namespace.
 pub trait EthBlocks:
     LoadBlock<RpcConvert: RpcConvert<Primitives = Self::Primitives, Error = Self::Error>>
 {
-
-    /// Transaction detail structure
-    #[derive(Debug, Serialize)]
-    struct TransactionDetail {
-        hash: String,
-        from: String,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        created_contract: Option<String>,
-    }
 
     /// Helper function for `eth_getBlockTransactionDetails` that returns transaction details.
     ///
@@ -61,13 +56,12 @@ pub trait EthBlocks:
                 let transactions = block
                     .transactions_recovered()
                     .zip(receipts.iter())
-                    .map(|(tx, receipt)| {
+                    .map(|(tx, _receipt)| {
                         let hash = *tx.tx_hash();
-                        let from = tx.recover_signer().map(|addr| addr.to_string()).unwrap_or_default();
+                        let from = tx.signer().to_string();
                         
-                        // Check if this transaction created a contract
-                        let created_contract = if let Some(contract_address) = receipt.contract_address() {
-                            Some(contract_address.to_string())
+                        let created_contract = if tx.to().is_none() {
+                            Some(tx.signer().create(tx.nonce()).to_string())
                         } else {
                             None
                         };
